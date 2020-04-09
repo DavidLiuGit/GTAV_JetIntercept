@@ -45,7 +45,8 @@ namespace AirTraffic
 			// determine if we need to spawn a plane
 			if (currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
 			{
-				_spawnedVehicles.Add(spawnAirTraffic());
+				Vehicle veh = spawnAirTraffic();
+				if (veh != null) _spawnedVehicles.Add(veh);
 				_lastVehicleSpawnTime = currTime;
 			}
 
@@ -123,8 +124,13 @@ namespace AirTraffic
 
 			// spawn vehicle
 			Vehicle veh = World.CreateVehicle(selectedModel, spawnPos, spawnHeading);
-			veh.IsEngineRunning = true;
-			veh.LandingGearState = VehicleLandingGearState.Retracted;
+			if (veh == null)
+			{
+				GTA.UI.Notification.Show("~r~Air Traffic: unable to spawn model " + selectedModel.ToString());
+				return null;
+			}
+
+			// configure vehicle
 			configureVehicle(veh);
 
 			// spawn pilot in vehicle
@@ -142,6 +148,8 @@ namespace AirTraffic
 		protected virtual void configureVehicle(Vehicle veh)
 		{
 			veh.ForwardSpeed = 50f;
+			veh.IsEngineRunning = true;
+			veh.LandingGearState = VehicleLandingGearState.Retracted;
 		}
 
 
@@ -162,14 +170,12 @@ namespace AirTraffic
 		{
 			Ped pilot = veh.CreatePedOnSeat(VehicleSeat.Driver, PedHash.Pilot01SMY);
 			pilot.FiringPattern = FiringPattern.FullAuto;
-			pilot.Task.FightAgainst(Game.Player.Character);
 		}
 
 
 
 		protected Model[] readModelsFromString(string models)
 		{
-			GTA.UI.Notification.Show("models: " + models);
 			// split the string on comma delimiter, then generate hash from each model name
 			return models.Split(',').ToList().Select(model => (Model)Game.GenerateHash(model.Trim())).ToArray();
 		}

@@ -16,13 +16,13 @@ namespace AirTraffic
 		public JetTrafficController(ScriptSettings ss)
 			: base(ss)
 		{
-			// read in settings for Planes
+			// read in settings for Jets
 			string section = "Jets";
 			_models = readModelsFromString(ss.GetValue<string>(section, "models", "lazer"));
-			_spawnTime = ss.GetValue<int>(section, "spawnTime", 60);
+			_spawnTime = ss.GetValue<int>(section, "spawnTime", 120);
 			_minHeight = ss.GetValue<float>(section, "minHeight", 300f);
 			_maxHeight = ss.GetValue<float>(section, "maxHeight", 1000f);
-			_maxDistance = ss.GetValue<float>(section, "maxDistance", 2000f);
+			_maxDistance = ss.GetValue<float>(section, "maxDistance", 3000f);
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
 		}
 
@@ -35,11 +35,36 @@ namespace AirTraffic
 		}
 
 
-
 		protected override void configureVehicle(Vehicle veh)
 		{
 			base.configureVehicle(veh);
 			veh.ForwardSpeed = 120f;
+		}
+	}
+
+
+
+
+
+	class PlaneTrafficController : TrafficController
+	{
+		public PlaneTrafficController(ScriptSettings ss)
+			: base(ss)
+		{
+			string section = "Planes";
+			_spawnTime = ss.GetValue<int>(section, "spawnTime", 90);
+			_minHeight = ss.GetValue<float>(section, "minHeight", 500f);
+			_maxHeight = ss.GetValue<float>(section, "maxHeight", 1000f);
+			_maxDistance = ss.GetValue<float>(section, "maxDistance", 2000f);
+			_drawBlip = ss.GetValue<bool>(section, "blip", true);
+		}
+
+
+
+		protected override void configureVehicle(Vehicle veh)
+		{
+			base.configureVehicle(veh);
+			veh.ForwardSpeed = 90f;
 		}
 	}
 }

@@ -25,6 +25,7 @@ namespace AirTraffic
 		#region objReferences
 		ScriptSettings ss;
 		TrafficController jetCtrl;
+		TrafficController planeCtrl;
 		#endregion
 
 
@@ -47,12 +48,14 @@ namespace AirTraffic
 
 				ss = base.Settings;
 				jetCtrl = new JetTrafficController(ss);
+				planeCtrl = new PlaneTrafficController(ss);
 			}
 
 
 			else
 			{
 				jetCtrl.onTick();
+				planeCtrl.onTick();
 			}
 		}
 
