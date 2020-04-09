@@ -12,21 +12,31 @@ using GTA.Math;
 using GTA.UI;
 
 
-namespace ModName // !!!! IMPORTANT REPLACE THIS WITH YOUR MODS NAME !!!!
+namespace AirTraffic
 {
 	public class Main : Script
 	{
 		// You can set your mod information below! Be sure to do this!
 		bool firstTime = true;
-		string ModName = "MOD NAME";
-		string Developer = "YOUR NAME";
+		string ModName = "Custom Air Traffic";
+		string Developer = "iLike2Teabag";
+
+
+		#region objReferences
+		ScriptSettings ss;
+		TrafficController tc;
+		#endregion
+
 
 		public Main()
 		{
 			Tick += onTick;
 			KeyDown += onKeyDown;
-			Interval = 1;
+			Interval = 1000;
+			Aborted += onAbort;
 		}
+
+
 
 		private void onTick(object sender, EventArgs e)
 		{
@@ -34,34 +44,31 @@ namespace ModName // !!!! IMPORTANT REPLACE THIS WITH YOUR MODS NAME !!!!
 			{
 				Notification.Show(ModName + " by " + Developer + " Loaded");
 				firstTime = false;
+
+				ss = base.Settings;
+				tc = new TrafficController(ss);
 			}
-			// If the user has used the current mod version before, the text (and code) above will not appear
-
-			// You can now begin your code here!
-			Game.Player.Character.IsInvincible = true; // The character will be invincible if this script is active
 
 
-
-			// ------------- ANY CODE PLACED ABOVE THIS LINE WILL HAPPEN WITH EVERY TICK (1 MS) OF THE SCRIPT -----------------
+			else
+			{
+				tc.onTick();
+			}
 		}
+
+
+
 
 		private void onKeyDown(object sender, KeyEventArgs e)
 		{
 
 		}
 
-	}
-}
 
-namespace AirTraffic
-{
-	public class Main
-	{
-		// Nothing goes here
+
+		private void onAbort(object sender, EventArgs e)
+		{
+			tc.destructor(true);
+		}
 	}
 }
-// Useful Links
-// All Vehicles - https://pastebin.com/uTxZnhaN
-// All Player Models - https://pastebin.com/i5c1zA0W
-// All Weapons - https://pastebin.com/M3kD9pnJ
-// GTA V ScriptHook V Dot Net - https://www.gta5-mods.com/tools/scripthookv-net
