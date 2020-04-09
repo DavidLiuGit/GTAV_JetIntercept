@@ -15,17 +15,17 @@ namespace AirTraffic
 	{
 		#region properties
 		// general
-		private int _lastPlaneSpawnTime;
-		private Random rng = new Random();
+		protected int _lastVehicleSpawnTime;
+		protected Random rng = new Random();
 
 		// plane traffic
-		private Model[] _models;
-		private int _spawnTime;
-		private float _minHeight, _maxHeight, _maxDistance;
-		private bool _drawBlip;
+		protected Model[] _models;
+		protected int _spawnTime;
+		protected float _minHeight, _maxHeight, _maxDistance;
+		protected bool _drawBlip;
 
 		// references
-		private List<Vehicle> _spawnedVehicles = new List<Vehicle>();
+		protected List<Vehicle> _spawnedVehicles = new List<Vehicle>();
 		#endregion
 
 
@@ -34,16 +34,7 @@ namespace AirTraffic
 		#region constructor
 		public TrafficController(ScriptSettings ss)
 		{
-			_lastPlaneSpawnTime = Game.GameTime;
-
-			// read in settings for Planes
-			string section = "Planes";
-			_models = readModelsFromString(ss.GetValue<string>(section, "models", "lazer"));
-			_spawnTime = ss.GetValue<int>(section, "spawnTime", 60);
-			_minHeight = ss.GetValue<float>(section, "minHeight", 300f);
-			_maxHeight = ss.GetValue<float>(section, "maxHeight", 1000f);
-			_maxDistance = ss.GetValue<float>(section, "maxDistance", 2000f);
-			_drawBlip = ss.GetValue<bool>(section, "blip", true);
+			_lastVehicleSpawnTime = Game.GameTime;
 		}
 
 
@@ -52,10 +43,17 @@ namespace AirTraffic
 			int currTime = Game.GameTime;
 
 			// determine if we need to spawn a plane
-			if (currTime > _lastPlaneSpawnTime + _spawnTime * 1000)
+			if (currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
 			{
 				_spawnedVehicles.Add(spawnAirTraffic());
-				_lastPlaneSpawnTime = currTime;
+				_lastVehicleSpawnTime = currTime;
+			}
+
+			// check if each spawned vehicle is still driveable & close enough to player
+			foreach (Vehicle veh in _spawnedVehicles)
+			{
+				if (!keepVehicle(veh))
+					vehicleDestructor(veh);
 			}
 		}
 
@@ -63,14 +61,8 @@ namespace AirTraffic
 
 		public void destructor(bool force = false)
 		{
-			// if destroying by force, delete everything right away
-			if (force)
-			{
-				foreach(Vehicle veh in _spawnedVehicles){
-					veh.Driver.Delete();
-					veh.Delete();
-				}
-			}
+			foreach (Vehicle veh in _spawnedVehicles)
+				vehicleDestructor(veh, force);
 		}
 		#endregion
 
@@ -78,7 +70,47 @@ namespace AirTraffic
 
 
 		#region helpers
-		private Vehicle spawnAirTraffic()
+		protected virtual bool keepVehicle(Vehicle veh)
+		{
+			// check if vehicle still driveable, and pilot alive
+			if (!veh.IsDriveable || veh.Driver.IsDead)
+				return false;
+
+			// check whether the vehicle's position is close enough
+			if (veh.Position.DistanceTo2D(Game.Player.Character.Position) > _maxDistance)
+				return false;
+
+			return true;
+		}
+
+
+		protected virtual void vehicleDestructor(Vehicle veh, bool force = false)
+		{
+			try
+			{
+				// if destroying by force, delete all assets associated with the vehicle
+				if (force)
+				{
+					veh.Driver.Delete();
+					if (_drawBlip) veh.AttachedBlip.Delete();
+					veh.Delete();
+				}
+
+				// otherwise, task pilot to flee, and mark the pilot and vehicle as no longer needed
+				else
+				{
+					veh.Driver.Task.FleeFrom(Game.Player.Character);
+					veh.Driver.MarkAsNoLongerNeeded();
+					if (_drawBlip) veh.AttachedBlip.Delete();
+					veh.MarkAsNoLongerNeeded();
+				}
+			}
+			catch { }
+		}
+
+
+
+		protected virtual Vehicle spawnAirTraffic()
 		{
 			Model selectedModel = _models[rng.Next(0, _models.Length)];
 
@@ -92,28 +124,41 @@ namespace AirTraffic
 			// spawn vehicle
 			Vehicle veh = World.CreateVehicle(selectedModel, spawnPos, spawnHeading);
 			veh.IsEngineRunning = true;
-			veh.ForwardSpeed = 50f;
 			veh.LandingGearState = VehicleLandingGearState.Retracted;
+			configureVehicle(veh);
 
 			// spawn pilot in vehicle
 			spawnPilotInVehicle(veh);
 
 			// draw blip on vehicle
 			if (_drawBlip)
-			{
-				veh.AddBlip();
-				veh.AttachedBlip.Alpha = 120;
-				veh.AttachedBlip.Color = BlipColor.Grey;
-				veh.AttachedBlip.Scale = 0.75f;
-				veh.AttachedBlip.Sprite = BlipSprite.Plane;
-			}
+				drawCustomBlip(veh);
 
 			return veh;
 		}
 
 
 
-		private void spawnPilotInVehicle(Vehicle veh)
+		protected virtual void configureVehicle(Vehicle veh)
+		{
+			veh.ForwardSpeed = 50f;
+		}
+
+
+
+		protected virtual Blip drawCustomBlip(Vehicle veh)
+		{
+			Blip blip = veh.AddBlip();
+			blip.Alpha = 120;
+			blip.Color = BlipColor.Grey;
+			blip.Scale = 0.75f;
+			blip.Sprite = BlipSprite.Plane;
+			return blip;
+		}
+
+
+
+		protected virtual void spawnPilotInVehicle(Vehicle veh)
 		{
 			Ped pilot = veh.CreatePedOnSeat(VehicleSeat.Driver, PedHash.Pilot01SMY);
 			pilot.FiringPattern = FiringPattern.FullAuto;
@@ -122,8 +167,9 @@ namespace AirTraffic
 
 
 
-		private Model[] readModelsFromString(string models)
+		protected Model[] readModelsFromString(string models)
 		{
+			GTA.UI.Notification.Show("models: " + models);
 			// split the string on comma delimiter, then generate hash from each model name
 			return models.Split(',').ToList().Select(model => (Model)Game.GenerateHash(model.Trim())).ToArray();
 		}

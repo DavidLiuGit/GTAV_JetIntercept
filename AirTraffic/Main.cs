@@ -24,7 +24,7 @@ namespace AirTraffic
 
 		#region objReferences
 		ScriptSettings ss;
-		TrafficController tc;
+		TrafficController jetCtrl;
 		#endregion
 
 
@@ -46,13 +46,13 @@ namespace AirTraffic
 				firstTime = false;
 
 				ss = base.Settings;
-				tc = new TrafficController(ss);
+				jetCtrl = new JetTrafficController(ss);
 			}
 
 
 			else
 			{
-				tc.onTick();
+				jetCtrl.onTick();
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace AirTraffic
 
 		private void onAbort(object sender, EventArgs e)
 		{
-			tc.destructor(true);
+			jetCtrl.destructor(true);
 		}
 	}
 }
