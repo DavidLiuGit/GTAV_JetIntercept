@@ -38,7 +38,7 @@ namespace AirTraffic
 		}
 
 
-		public void onTick()
+		public virtual void onTick()
 		{
 			int currTime = Game.GameTime;
 
@@ -51,16 +51,20 @@ namespace AirTraffic
 			}
 
 			// check if each spawned vehicle is still driveable & close enough to player
-			foreach (Vehicle veh in _spawnedVehicles)
+			_spawnedVehicles.RemoveAll(veh =>
 			{
 				if (!keepVehicle(veh))
+				{
 					vehicleDestructor(veh);
-			}
+					return true;
+				}
+				return false;
+			});
 		}
 
 
 
-		public void destructor(bool force = false)
+		public virtual void destructor(bool force = false)
 		{
 			foreach (Vehicle veh in _spawnedVehicles)
 				vehicleDestructor(veh, force);
@@ -92,19 +96,20 @@ namespace AirTraffic
 				// if destroying by force, delete all assets associated with the vehicle
 				if (force)
 				{
-					veh.Driver.Delete();
 					if (_drawBlip) veh.AttachedBlip.Delete();
+					veh.Driver.Delete();
 					veh.Delete();
 				}
 
 				// otherwise, task pilot to flee, and mark the pilot and vehicle as no longer needed
 				else
 				{
+					if (_drawBlip) veh.AttachedBlip.Delete();
 					veh.Driver.Task.FleeFrom(Game.Player.Character);
 					veh.Driver.MarkAsNoLongerNeeded();
-					if (_drawBlip) veh.AttachedBlip.Delete();
 					veh.MarkAsNoLongerNeeded();
 				}
+
 			}
 			catch { }
 		}
@@ -116,10 +121,7 @@ namespace AirTraffic
 			Model selectedModel = _models[rng.Next(0, _models.Length)];
 
 			// determine the position and orientation to spawn the vehicle
-			float spawnAltitude = (float) rng.NextDouble() * (_maxHeight - _minHeight) + _minHeight;
-			float spawnDistance = (float) rng.NextDouble() * (_maxDistance / 2) + 50f;
-			Vector3 spawnPos = Game.Player.Character.Position.Around(spawnDistance);
-			spawnPos.Z = spawnAltitude;
+			Vector3 spawnPos = getSpawnPosition();
 			float spawnHeading = (float)rng.NextDouble() * 360f;
 
 			// spawn vehicle
@@ -145,6 +147,17 @@ namespace AirTraffic
 
 
 
+		protected virtual Vector3 getSpawnPosition()
+		{
+			float spawnAltitude = (float)rng.NextDouble() * (_maxHeight - _minHeight) + _minHeight;
+			float spawnDistance = (float)rng.NextDouble() * (_maxDistance / 2) + 150f;
+			Vector3 spawnPos = Game.Player.Character.Position.Around(spawnDistance);
+			spawnPos.Z = spawnAltitude;
+			return spawnPos;
+		}
+
+
+
 		protected virtual void configureVehicle(Vehicle veh)
 		{
 			veh.ForwardSpeed = 50f;
@@ -166,10 +179,11 @@ namespace AirTraffic
 
 
 
-		protected virtual void spawnPilotInVehicle(Vehicle veh)
+		protected virtual Ped spawnPilotInVehicle(Vehicle veh)
 		{
 			Ped pilot = veh.CreatePedOnSeat(VehicleSeat.Driver, PedHash.Pilot01SMY);
 			pilot.FiringPattern = FiringPattern.FullAuto;
+			return pilot;
 		}
 
 

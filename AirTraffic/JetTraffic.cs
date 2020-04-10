@@ -52,6 +52,7 @@ namespace AirTraffic
 			: base(ss)
 		{
 			string section = "Planes";
+			_models = readModelsFromString(ss.GetValue<string>(section, "models", "luxor"));
 			_spawnTime = ss.GetValue<int>(section, "spawnTime", 90);
 			_minHeight = ss.GetValue<float>(section, "minHeight", 500f);
 			_maxHeight = ss.GetValue<float>(section, "maxHeight", 1000f);
