@@ -124,7 +124,8 @@ namespace AirTraffic
 
 		protected override Ped spawnPilotInVehicle(Vehicle veh)
 		{
-			Ped p = base.spawnPilotInVehicle(veh);
+			Ped p = veh.CreatePedOnSeat(VehicleSeat.Driver, PedHash.Swat01SMY);
+			p.FiringPattern = FiringPattern.FullAuto;
 			p.Task.FightAgainst(Game.Player.Character);
 			p.AlwaysKeepTask = true;
 			p.DrivingStyle = DrivingStyle.Rushed;
