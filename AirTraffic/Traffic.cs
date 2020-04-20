@@ -11,7 +11,7 @@ using GTA.Math;
 
 namespace AirTraffic
 {
-	public class TrafficController
+	public abstract class TrafficController
 	{
 		#region properties
 		// general

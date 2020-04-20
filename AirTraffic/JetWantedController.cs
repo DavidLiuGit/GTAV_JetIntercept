@@ -117,7 +117,7 @@ namespace AirTraffic
 
 			// place the attacking jet behind the player
 			Vector3 playerPos = Game.Player.Character.Position;
-			Vector3 spawnPos = playerPos + Game.Player.Character.ForwardVector * -rng.Next(150, 300);
+			Vector3 spawnPos = playerPos + Game.Player.Character.ForwardVector * -rng.Next(250, 400);
 			spawnPos = spawnPos.Around((float)rng.NextDouble() * 200f);
 			spawnPos.Z = Math.Max(300f, playerPos.Z + rng.Next(-100, 100));
 			veh.Position = spawnPos;
@@ -133,7 +133,7 @@ namespace AirTraffic
 
 		protected override Blip drawCustomBlip(Vehicle veh)
 		{
-			Blip blip = base.drawCustomBlip(veh);
+			Blip blip = veh.AddBlip();
 			blip.Sprite = BlipSprite.Jet;
 			blip.Color = BlipColor.Red;
 			return blip;
