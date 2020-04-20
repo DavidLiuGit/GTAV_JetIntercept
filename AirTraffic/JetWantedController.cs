@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using GTA;
 using GTA.Math;
+using GTA.Native;
 
 
 namespace AirTraffic
@@ -84,12 +85,18 @@ namespace AirTraffic
 			// if there are too many jets, dismiss extra jets
 			else if (activeJets > jetsNeeded)
 			{
-				for (int i = activeJets; i > jetsNeeded; i--)
+				for (int i = activeJets; i >= jetsNeeded; i--)
 				{
 					vehicleDestructor(_spawnedVehicles[i - 1], false);
 					_spawnedVehicles.RemoveAt(i - 1);
 				}
 			}
+			
+			// for each active jet/pilot, invoke its onTick
+			//foreach (Vehicle veh in _spawnedVehicles)
+			//{
+			//	pilotOnTick(veh, veh.Driver, Game.Player.Character);
+			//}
 		}
 
 
@@ -131,6 +138,25 @@ namespace AirTraffic
 			p.DrivingStyle = DrivingStyle.Rushed;
 			p.RelationshipGroup = (RelationshipGroup)0xA49E591C;
 			return p;
+		}
+
+
+
+		protected void pilotOnTick(Vehicle jet, Ped pilot, Ped player)
+		{
+			// if player's jet is BEHIND the attacking jet
+			if (Vector3.Dot(pilot.Position - player.Position, player.Rotation) > 0.0f)
+			{
+				// if the attacking jet is also facing away from the player, task it with chasing the player
+				if (Vector3.Dot(pilot.Rotation, player.Rotation) > 0.0f)
+				{
+					pilot.Task.ChaseWithPlane(player, Vector3.Zero);
+					GTA.UI.Screen.ShowHelpTextThisFrame("Player behind pilot. Retasking.");
+				}
+			}
+
+			// otherwise, task pursuing pilot with attacking player
+			pilot.Task.FightAgainst(Game.Player.Character);
 		}
 	}
 }
