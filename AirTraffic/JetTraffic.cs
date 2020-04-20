@@ -13,6 +13,8 @@ namespace AirTraffic
 {
 	class JetTrafficController : TrafficController
 	{
+
+
 		public JetTrafficController(ScriptSettings ss)
 			: base(ss)
 		{
@@ -24,6 +26,9 @@ namespace AirTraffic
 			_maxHeight = ss.GetValue<float>(section, "maxHeight", 1000f);
 			_maxDistance = ss.GetValue<float>(section, "maxDistance", 3000f);
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
+
+			// configure airports
+			_airports = new List<Airport> { Airports.zancudo };
 		}
 
 
@@ -40,6 +45,17 @@ namespace AirTraffic
 			base.configureVehicle(veh);
 			veh.ForwardSpeed = 120f;
 		}
+
+
+		protected override void pilotTasking(Vehicle veh, Ped pilot)
+		{
+			// task pilot with landing at an airport
+			Airport ap = _airports[rng.Next(0, _airports.Count)];
+			Airport.Runway rw = ap.runways[rng.Next(0, ap.runways.Length)];
+			pilot.Task.LandPlane(rw.startPos, rw.endPos, veh);
+			GTA.UI.Notification.Show("Pilot tasked to land at " + ap.name);
+		}
+	
 	}
 
 
@@ -58,6 +74,9 @@ namespace AirTraffic
 			_maxHeight = ss.GetValue<float>(section, "maxHeight", 1000f);
 			_maxDistance = ss.GetValue<float>(section, "maxDistance", 2000f);
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
+
+			// configure airports
+			_airports = new List<Airport> { Airports.zancudo };
 		}
 
 
@@ -66,6 +85,17 @@ namespace AirTraffic
 		{
 			base.configureVehicle(veh);
 			veh.ForwardSpeed = 90f;
+		}
+
+
+
+		protected override void pilotTasking(Vehicle veh, Ped pilot)
+		{
+			// task pilot with landing at an airport
+			Airport ap = _airports[rng.Next(0, _airports.Count)];
+			Airport.Runway rw = ap.runways[rng.Next(0, ap.runways.Length)];
+			pilot.Task.LandPlane(rw.startPos, rw.endPos, veh);
+			GTA.UI.Notification.Show("Pilot tasked to land at " + ap.name);
 		}
 	}
 }

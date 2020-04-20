@@ -145,11 +145,17 @@ namespace AirTraffic
 		{
 			Ped p = veh.CreatePedOnSeat(VehicleSeat.Driver, PedHash.Swat01SMY);
 			p.FiringPattern = FiringPattern.FullAuto;
-			p.Task.FightAgainst(Game.Player.Character);
-			p.AlwaysKeepTask = true;
 			p.DrivingStyle = DrivingStyle.Rushed;
 			p.RelationshipGroup = (RelationshipGroup)0xA49E591C;
 			return p;
+		}
+
+
+
+		protected override void pilotTasking(Vehicle veh, Ped pilot)
+		{
+			pilot.Task.FightAgainst(Game.Player.Character);
+			pilot.AlwaysKeepTask = true;
 		}
 
 

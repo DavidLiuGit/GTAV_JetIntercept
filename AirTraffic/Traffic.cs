@@ -26,6 +26,7 @@ namespace AirTraffic
 
 		// references
 		protected List<Vehicle> _spawnedVehicles = new List<Vehicle>();
+		protected List<Airport> _airports;
 		#endregion
 
 
@@ -35,6 +36,7 @@ namespace AirTraffic
 		public TrafficController(ScriptSettings ss)
 		{
 			_lastVehicleSpawnTime = Game.GameTime;
+			_airports = new List<Airport>();
 		}
 
 
@@ -77,8 +79,12 @@ namespace AirTraffic
 		#region helpers
 		protected virtual bool keepVehicle(Vehicle veh)
 		{
+			// check if vehicle is not null and exists
+			if (veh == null || !veh.Exists())
+				return false;
+
 			// check if vehicle still driveable, and pilot alive
-			if (!veh.IsDriveable || veh.Driver.IsDead)
+			if (!veh.IsDriveable || veh.Driver == null || veh.Driver.IsDead)
 				return false;
 
 			// check whether the vehicle's position is close enough
@@ -136,7 +142,10 @@ namespace AirTraffic
 			configureVehicle(veh);
 
 			// spawn pilot in vehicle
-			spawnPilotInVehicle(veh);
+			Ped pilot = spawnPilotInVehicle(veh);
+
+			// give the pilot a task
+			pilotTasking(veh, pilot);
 
 			// draw blip on vehicle
 			if (_drawBlip)
@@ -193,6 +202,10 @@ namespace AirTraffic
 			// split the string on comma delimiter, then generate hash from each model name
 			return models.Split(',').ToList().Select(model => (Model)Game.GenerateHash(model.Trim())).ToArray();
 		}
+
+
+
+		protected abstract void pilotTasking(Vehicle veh, Ped pilot);
 		#endregion
 	}
 }
