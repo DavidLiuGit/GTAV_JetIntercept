@@ -58,6 +58,20 @@ namespace AirTraffic
 				return false;
 			});
 
+			// determine if we need to spawn more jets
+			int activeJets = _spawnedVehicles.Count;
+			int jetsNeeded = numJetsByWantedLevel[Game.Player.WantedLevel];
+
+			// if there are too many jets, dismiss extra jets
+			if (activeJets > jetsNeeded)
+			{
+				for (int i = activeJets; i > jetsNeeded; i--)
+				{
+					vehicleDestructor(_spawnedVehicles[0], false);
+					_spawnedVehicles.RemoveAt(0);
+				}
+			}
+
 			// if player is not in aircraft and _aircraftOnly is true, do nothing
 			if (_aircraftOnly){
 				Vehicle playerVeh = Game.Player.Character.CurrentVehicle;
@@ -66,10 +80,6 @@ namespace AirTraffic
 				// if player's vehicle is not an aircraft, do nothing
 				else if (!playerVeh.Model.IsPlane && !playerVeh.Model.IsHelicopter) return;
 			}
-			
-			// determine if we need to spawn more jets
-			int activeJets = _spawnedVehicles.Count;
-			int jetsNeeded = numJetsByWantedLevel[Game.Player.WantedLevel];
 
 			// if more jets are needed:
 			if (activeJets < jetsNeeded && currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
@@ -82,16 +92,6 @@ namespace AirTraffic
 				}
 			}
 
-			// if there are too many jets, dismiss extra jets
-			else if (activeJets > jetsNeeded)
-			{
-				for (int i = activeJets; i >= jetsNeeded; i--)
-				{
-					vehicleDestructor(_spawnedVehicles[i - 1], false);
-					_spawnedVehicles.RemoveAt(i - 1);
-				}
-			}
-			
 			// for each active jet/pilot, invoke its onTick
 			//foreach (Vehicle veh in _spawnedVehicles)
 			//{
@@ -114,7 +114,19 @@ namespace AirTraffic
 		protected override void configureVehicle(Vehicle veh)
 		{
 			base.configureVehicle(veh);
-			veh.ForwardSpeed = 120f;
+
+			// place the attacking jet behind the player
+			Vector3 playerPos = Game.Player.Character.Position;
+			Vector3 spawnPos = playerPos + Game.Player.Character.ForwardVector * -rng.Next(150, 300);
+			spawnPos = spawnPos.Around((float)rng.NextDouble() * 200f);
+			spawnPos.Z = Math.Max(300f, playerPos.Z + rng.Next(-100, 100));
+			veh.Position = spawnPos;
+
+			// orient the attacking jet towards the player
+			veh.Heading = Game.Player.Character.Heading;
+
+			// set the attacking jet's speed to 200 kmh or player's current speed, whichever is higher
+			veh.ForwardSpeed = Math.Max(200f, Game.Player.Character.Speed);
 		}
 
 
