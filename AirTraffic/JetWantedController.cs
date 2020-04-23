@@ -66,10 +66,6 @@ namespace AirTraffic
 			Vehicle playerVeh = Game.Player.Character.CurrentVehicle;
 			if (playerVeh == null) jetsNeeded = 0;
 			else if (!playerVeh.Model.IsPlane && !playerVeh.Model.IsHelicopter) jetsNeeded = 0;
-			
-			// debug
-			if (jetsNeeded > 0)
-				GTA.UI.Screen.ShowHelpTextThisFrame("Jets needed: " + jetsNeeded);
 
 			// if there are too many jets, dismiss extra jets
 			if (activeJets > jetsNeeded)
@@ -82,7 +78,7 @@ namespace AirTraffic
 			}
 			
 			// if more jets are needed:
-			if (activeJets < jetsNeeded && currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
+			else if (activeJets < jetsNeeded && currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
 			{
 				for (int i = activeJets; i < jetsNeeded; i++)	// assumes spawn is successful to avoid infinite loop
 				{
