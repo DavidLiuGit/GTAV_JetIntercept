@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using GTA;
 using GTA.Math;
+using GTA.UI;
+using GTA.Native;
 
 
 namespace AirTraffic
@@ -28,7 +30,7 @@ namespace AirTraffic
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
 
 			// configure airports
-			_airports = new List<Airport> { Airports.zancudo };
+			_airports = new List<Airport> { Airports.zancudo, Airports.lsia };
 		}
 
 
@@ -53,7 +55,7 @@ namespace AirTraffic
 			Airport ap = _airports[rng.Next(0, _airports.Count)];
 			Airport.Runway rw = ap.runways[rng.Next(0, ap.runways.Length)];
 			pilot.Task.LandPlane(rw.startPos, rw.endPos, veh);
-			GTA.UI.Notification.Show("Pilot tasked to land at " + ap.name);
+			Notification.Show("Jet landing at " + ap.name);
 		}
 	
 	}
@@ -76,7 +78,7 @@ namespace AirTraffic
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
 
 			// configure airports
-			_airports = new List<Airport> { Airports.zancudo };
+			_airports = new List<Airport> { Airports.lsia, Airports.sandyShores };
 		}
 
 
@@ -95,7 +97,8 @@ namespace AirTraffic
 			Airport ap = _airports[rng.Next(0, _airports.Count)];
 			Airport.Runway rw = ap.runways[rng.Next(0, ap.runways.Length)];
 			pilot.Task.LandPlane(rw.startPos, rw.endPos, veh);
-			GTA.UI.Notification.Show("Pilot tasked to land at " + ap.name);
+
+			Notification.Show("Plane landing at " + ap.name);
 		}
 	}
 }

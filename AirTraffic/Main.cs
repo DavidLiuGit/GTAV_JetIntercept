@@ -24,8 +24,6 @@ namespace AirTraffic
 
 		#region objReferences
 		ScriptSettings ss;
-		TrafficController jetCtrl;
-		TrafficController planeCtrl;
 		TrafficController jetWantedCtrl;
 		#endregion
 
@@ -48,16 +46,12 @@ namespace AirTraffic
 				firstTime = false;
 
 				ss = base.Settings;
-				jetCtrl = new JetTrafficController(ss);
-				planeCtrl = new PlaneTrafficController(ss);
 				jetWantedCtrl = new JetWantedController(ss);
 			}
 
 
 			else
 			{
-				jetCtrl.onTick();
-				planeCtrl.onTick();
 				jetWantedCtrl.onTick();
 			}
 		}
@@ -74,8 +68,6 @@ namespace AirTraffic
 
 		private void onAbort(object sender, EventArgs e)
 		{
-			jetCtrl.destructor(true);
-			planeCtrl.destructor(true);
 			jetWantedCtrl.destructor(true);
 		}
 	}

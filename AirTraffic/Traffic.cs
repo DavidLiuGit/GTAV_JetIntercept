@@ -35,7 +35,7 @@ namespace AirTraffic
 		#region constructor
 		public TrafficController(ScriptSettings ss)
 		{
-			_lastVehicleSpawnTime = Game.GameTime;
+			_lastVehicleSpawnTime = -9999;
 			_airports = new List<Airport>();
 		}
 

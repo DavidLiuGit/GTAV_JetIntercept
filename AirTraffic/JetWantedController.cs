@@ -62,6 +62,15 @@ namespace AirTraffic
 			int activeJets = _spawnedVehicles.Count;
 			int jetsNeeded = numJetsByWantedLevel[Game.Player.WantedLevel];
 
+			// check if player is in a jet/heli
+			Vehicle playerVeh = Game.Player.Character.CurrentVehicle;
+			if (playerVeh == null) jetsNeeded = 0;
+			else if (!playerVeh.Model.IsPlane && !playerVeh.Model.IsHelicopter) jetsNeeded = 0;
+			
+			// debug
+			if (jetsNeeded > 0)
+				GTA.UI.Screen.ShowHelpTextThisFrame("Jets needed: " + jetsNeeded);
+
 			// if there are too many jets, dismiss extra jets
 			if (activeJets > jetsNeeded)
 			{
@@ -71,16 +80,7 @@ namespace AirTraffic
 					_spawnedVehicles.RemoveAt(0);
 				}
 			}
-
-			// if player is not in aircraft and _aircraftOnly is true, do nothing
-			if (_aircraftOnly){
-				Vehicle playerVeh = Game.Player.Character.CurrentVehicle;
-				// if player is not in a vehicle, do nothing
-				if (playerVeh == null) return;
-				// if player's vehicle is not an aircraft, do nothing
-				else if (!playerVeh.Model.IsPlane && !playerVeh.Model.IsHelicopter) return;
-			}
-
+			
 			// if more jets are needed:
 			if (activeJets < jetsNeeded && currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
 			{
@@ -91,19 +91,13 @@ namespace AirTraffic
 					_lastVehicleSpawnTime = currTime;
 				}
 			}
-
-			// for each active jet/pilot, invoke its onTick
-			//foreach (Vehicle veh in _spawnedVehicles)
-			//{
-			//	pilotOnTick(veh, veh.Driver, Game.Player.Character);
-			//}
 		}
 
 
 		protected override bool keepVehicle(Vehicle veh)
 		{
 			// check if vehicle still driveable, and pilot alive
-			if (!veh.IsDriveable || veh.Driver.IsDead)
+			if (!veh.IsDriveable || veh.Driver == null || veh.Driver.IsDead)
 				return false;
 
 			return true;
