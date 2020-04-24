@@ -20,6 +20,7 @@ namespace AirTraffic
 
 		// plane traffic
 		protected Model[] _models;
+		protected Dictionary<Model, string> _modelDict;
 		protected int _spawnTime;
 		protected float _minHeight, _maxHeight, _maxDistance;
 		protected bool _drawBlip;
@@ -134,7 +135,8 @@ namespace AirTraffic
 			Vehicle veh = World.CreateVehicle(selectedModel, spawnPos, spawnHeading);
 			if (veh == null)
 			{
-				GTA.UI.Notification.Show("~r~Air Traffic: unable to spawn model " + selectedModel.ToString());
+				string modelName = _modelDict[selectedModel];
+				GTA.UI.Notification.Show("~r~Air Traffic: unable to spawn vehicle: " + modelName);
 				return null;
 			}
 
@@ -203,6 +205,14 @@ namespace AirTraffic
 			return models.Split(',').ToList().Select(model => (Model)Game.GenerateHash(model.Trim())).ToArray();
 		}
 
+
+
+		protected Dictionary<Model, string> readModelsFromStringToDict(string models)
+		{
+			// same as readModelsFromString, but creates a dictionary
+			List<string> modelStrings = models.Split(',').ToList();
+			return modelStrings.ToDictionary(model => (Model)Game.GenerateHash(model.Trim()), model => model);
+		}
 
 
 		protected abstract void pilotTasking(Vehicle veh, Ped pilot);
