@@ -110,7 +110,7 @@ namespace AirTraffic
 
 			// place the attacking jet behind the player
 			Vector3 playerPos = Game.Player.Character.Position;
-			Vector3 spawnPos = playerPos + Game.Player.Character.ForwardVector * _spawnDistance;
+			Vector3 spawnPos = playerPos + Game.Player.Character.ForwardVector * -_spawnDistance;
 			spawnPos = spawnPos.Around((float)rng.NextDouble() * (_spawnDistance * 0.25f));
 			spawnPos.Z = Math.Max(300f, playerPos.Z + rng.Next(-100, 100));		// enforce minimum spawn altitude
 			veh.Position = spawnPos;
