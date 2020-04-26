@@ -16,6 +16,7 @@ namespace AirTraffic
 		#region properties
 		protected int[] numJetsByWantedLevel;
 		protected bool _aircraftOnly;
+		protected float _spawnDistance;
 		#endregion
 
 
@@ -35,6 +36,7 @@ namespace AirTraffic
 			_aircraftOnly = ss.GetValue<bool>(section, "aircraftOnly", true);
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
 			_spawnTime = ss.GetValue<int>(section, "respawnTime", 30);
+			_spawnDistance = ss.GetValue<float>(section, "_spawnDistance", 500f);
 
 			_minHeight = 300f;
 			_maxHeight = 1500f;
@@ -108,9 +110,9 @@ namespace AirTraffic
 
 			// place the attacking jet behind the player
 			Vector3 playerPos = Game.Player.Character.Position;
-			Vector3 spawnPos = playerPos + Game.Player.Character.ForwardVector * -rng.Next(250, 400);
-			spawnPos = spawnPos.Around((float)rng.NextDouble() * 200f);
-			spawnPos.Z = Math.Max(300f, playerPos.Z + rng.Next(-100, 100));
+			Vector3 spawnPos = playerPos + Game.Player.Character.ForwardVector * _spawnDistance;
+			spawnPos = spawnPos.Around((float)rng.NextDouble() * (_spawnDistance * 0.25f));
+			spawnPos.Z = Math.Max(300f, playerPos.Z + rng.Next(-100, 100));		// enforce minimum spawn altitude
 			veh.Position = spawnPos;
 
 			// orient the attacking jet towards the player
