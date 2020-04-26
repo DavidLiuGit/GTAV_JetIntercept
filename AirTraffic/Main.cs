@@ -47,6 +47,7 @@ namespace AirTraffic
 
 				ss = base.Settings;
 				jetWantedCtrl = new JetWantedController(ss);
+				new StringCheats();
 			}
 
 
@@ -61,7 +62,7 @@ namespace AirTraffic
 
 		private void onKeyDown(object sender, KeyEventArgs e)
 		{
-
+			StringCheats.handleKeyDown(e);
 		}
 
 
