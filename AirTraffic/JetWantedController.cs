@@ -16,7 +16,9 @@ namespace AirTraffic
 		#region properties
 		protected int[] numJetsByWantedLevel;
 		protected bool _aircraftOnly;
+		protected bool _belowRadar;
 		protected float _spawnDistance;
+		protected const float _radarHeight = 100f;
 		#endregion
 
 
@@ -36,7 +38,8 @@ namespace AirTraffic
 			_aircraftOnly = ss.GetValue<bool>(section, "aircraftOnly", true);
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
 			_spawnTime = ss.GetValue<int>(section, "respawnTime", 30);
-			_spawnDistance = ss.GetValue<float>(section, "_spawnDistance", 500f);
+			_spawnDistance = ss.GetValue<float>(section, "spawnDistance", 500f);
+			_belowRadar = ss.GetValue<bool>(section, "belowRadar", true);
 
 			_minHeight = 300f;
 			_maxHeight = 1500f;
@@ -81,7 +84,8 @@ namespace AirTraffic
 			}
 			
 			// if more jets are needed:
-			else if (activeJets < jetsNeeded && currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
+			else if (activeJets < jetsNeeded && !belowRadar(playerVeh)
+				&& currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
 			{
 				for (int i = activeJets; i < jetsNeeded; i++)	// assumes spawn is successful to avoid infinite loop
 				{
@@ -91,6 +95,7 @@ namespace AirTraffic
 				}
 			}
 		}
+
 
 
 		protected override bool keepVehicle(Vehicle veh)
@@ -168,6 +173,19 @@ namespace AirTraffic
 
 			// otherwise, task pursuing pilot with attacking player
 			pilot.Task.FightAgainst(Game.Player.Character);
+		}
+
+
+
+		protected bool belowRadar(Vehicle playerVeh)
+		{
+			if (!_belowRadar)
+				return false;
+
+			if (playerVeh.HeightAboveGround < _radarHeight)
+				return true;
+
+			return false;
 		}
 	}
 }

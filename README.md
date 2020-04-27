@@ -16,6 +16,9 @@ Jets are scrambled automatically
 The number of jets at each wanted level can be changed in .INI
 Models of jets scrambled can be changed in .INI
 
+### Below Radar
+If `belowRadar` setting is `true`, no jets will be scrambled if you are less than 100 meters above the ground.
+
 ### Cheats (shortcuts)
 In cheats, type:
   - `goto lsia`, `goto zancudo`, or `goto sandyshores` to teleport to an airport
@@ -23,6 +26,10 @@ In cheats, type:
 
 ---
 ## Changelog
+### 0.2.5:
+- implemented below radar setting; jets will not be scrambled if player's aircraft is < 100 meters above the ground
+### 0.2.4:
+- make pursuing jets spawn **behind** player instead of in front, by default
 ### 0.2.3:
 - added INI setting for spawn distance; default value 500 meters
 ### 0.2.2 (unreleased):
