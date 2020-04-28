@@ -66,12 +66,7 @@ namespace AirTraffic
 
 			// determine if we need to spawn more jets
 			int activeJets = _spawnedVehicles.Count;
-			int jetsNeeded = numJetsByWantedLevel[Game.Player.WantedLevel];
-
-			// check if player is in a jet/heli
-			Vehicle playerVeh = Game.Player.Character.CurrentVehicle;
-			if (playerVeh == null) jetsNeeded = 0;
-			else if (!playerVeh.Model.IsPlane && !playerVeh.Model.IsHelicopter) jetsNeeded = 0;
+			int jetsNeeded = determineJetsNeeded();
 
 			// if there are too many jets, dismiss extra jets
 			if (activeJets > jetsNeeded)
@@ -84,7 +79,7 @@ namespace AirTraffic
 			}
 			
 			// if more jets are needed:
-			else if (activeJets < jetsNeeded && !belowRadar(playerVeh)
+			else if (activeJets < jetsNeeded && !belowRadar(Game.Player.Character)
 				&& currTime > _lastVehicleSpawnTime + _spawnTime * 1000)
 			{
 				for (int i = activeJets; i < jetsNeeded; i++)	// assumes spawn is successful to avoid infinite loop
@@ -94,6 +89,27 @@ namespace AirTraffic
 					_lastVehicleSpawnTime = currTime;
 				}
 			}
+		}
+
+
+		/// <summary>
+		/// Determine the number of jets needed.
+		/// </summary>
+		/// <returns></returns>
+		protected int determineJetsNeeded()
+		{
+			int jetsNeeded = numJetsByWantedLevel[Game.Player.WantedLevel];
+
+			// if aircraftOnly is true:
+			if (_aircraftOnly)
+			{
+				// get the player's current vehicle, if any
+				Vehicle playerVeh = Game.Player.Character.CurrentVehicle;
+				if (playerVeh == null) jetsNeeded = 0;
+				else if (!playerVeh.Model.IsPlane && !playerVeh.Model.IsHelicopter) jetsNeeded = 0;
+			}
+
+			return jetsNeeded;
 		}
 
 
@@ -176,13 +192,17 @@ namespace AirTraffic
 		}
 
 
-
-		protected bool belowRadar(Vehicle playerVeh)
+		/// <summary>
+		/// Determine whether the player is below radar
+		/// </summary>
+		/// <param name="player"></param>
+		/// <returns><c>true</c> if player is below radar</returns>
+		protected bool belowRadar(Entity player)
 		{
 			if (!_belowRadar)
 				return false;
 
-			if (playerVeh.HeightAboveGround < _radarHeight)
+			if (player.HeightAboveGround < _radarHeight)
 				return true;
 
 			return false;

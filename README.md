@@ -12,12 +12,17 @@ ScriptHookVDotNet 3
 
 ---
 ## Usage
-Jets are scrambled automatically
-The number of jets at each wanted level can be changed in .INI
+Jets are scrambled automatically.  
+The number of jets at each wanted level can be changed in .INI.  
 Models of jets scrambled can be changed in .INI
 
-### Below Radar
-If `belowRadar` setting is `true`, no jets will be scrambled if you are less than 100 meters above the ground.
+### Settings
+#### Aircraft Only
+If `aircraftOnly` setting is `true`, jets will only be scrambled if you are in a helicopter or plane.
+
+#### Below Radar
+If `belowRadar` setting is `true`, no jets will be scrambled if you are less than 100 meters above the ground. Any jets already spawned and chasing you will continue to chase you, even if you drop below 100 meters.  
+**This setting applies even if `aircraftOnly` is `false`**. If you want jets to be scrambled while you're on foot or in a car on the ground, you must set `belowRadar=false`.
 
 ### Cheats (shortcuts)
 In cheats, type:
@@ -26,6 +31,8 @@ In cheats, type:
 
 ---
 ## Changelog
+### 0.3:
+- restored `aircraftOnly` option
 ### 0.2.5:
 - implemented below radar setting; jets will not be scrambled if player's aircraft is < 100 meters above the ground
 ### 0.2.4:
