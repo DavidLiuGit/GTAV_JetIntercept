@@ -205,15 +205,6 @@ namespace AirTraffic
 		}
 
 
-
-		protected Dictionary<Model, string> readModelsFromStringToDict(string models)
-		{
-			// same as readModelsFromString, but creates a dictionary
-			List<string> modelStrings = models.Split(',').ToList();
-			return modelStrings.ToDictionary(model => (Model)Game.GenerateHash(model.Trim()), model => model);
-		}
-
-
 		protected abstract void pilotTasking(Vehicle veh, Ped pilot);
 		#endregion
 	}

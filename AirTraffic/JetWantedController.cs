@@ -29,7 +29,6 @@ namespace AirTraffic
 			// read in settings for Jets
 			string section = "JetsWanted";
 			_jets = readCwjFromString(ss.GetValue<string>(section, "models", "lazer,hydra"));
-			//_modelDict = readModelsFromStringToDict(ss.GetValue<string>(section, "models", "lazer,hydra"));
 			numJetsByWantedLevel = new int[] {
 				0, 0, 0,											// 0, 1, and 2 stars respectively
 				ss.GetValue<int>(section, "numJets3stars", 0),		// 3 stars
@@ -267,7 +266,6 @@ namespace AirTraffic
 
 			// custom weapons: split each modelString on colon ":"
 			CustomWeaponJet[] cwj = new CustomWeaponJet[modelStrings.Count];
-			//foreach (string modelString in modelStrings)
 			for (int i = 0; i < modelStrings.Count; i++)
 			{
 				List<string> modelStringSplit = modelStrings[i].Trim().Split(':').ToList();
