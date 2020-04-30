@@ -270,7 +270,7 @@ namespace AirTraffic
 			//foreach (string modelString in modelStrings)
 			for (int i = 0; i < modelStrings.Count; i++)
 			{
-				List<string> modelStringSplit = modelStrings[i].Split(':').ToList();
+				List<string> modelStringSplit = modelStrings[i].Trim().Split(':').ToList();
 				cwj[i] = new CustomWeaponJet()
 				{
 					modelString = modelStrings[i],
