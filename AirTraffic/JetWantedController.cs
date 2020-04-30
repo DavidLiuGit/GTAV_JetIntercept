@@ -290,7 +290,9 @@ namespace AirTraffic
 		protected bool pilotSetVehicleWeapon(Ped pilot, Hash weaponHash)
 		{
 			// set pilot's vehicle weapon
-			return Function.Call<bool>(Hash.SET_CURRENT_PED_VEHICLE_WEAPON, pilot, weaponHash);
+			bool res = Function.Call<bool>(Hash.SET_CURRENT_PED_VEHICLE_WEAPON, pilot, weaponHash);
+			pilot.CanSwitchWeapons = false;
+			return res;
 		}
 	}
 
