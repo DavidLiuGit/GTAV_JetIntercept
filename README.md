@@ -17,6 +17,26 @@ The number of jets at each wanted level can be changed in .INI.
 Models of jets scrambled can be changed in .INI
 
 ### Settings
+#### Models
+A comma-separated list of the jet models to be spawned. Add-on jet model names are allowed. Models are selected randomly. **Custom weapon are supported**, provided you've formatted this setting correctly.
+
+**Optional:** to make a jet use a custom weapon, format a model name like so: `[model_name]:[weapon_name]`.  
+For example, if you'd like to use [Voltrock & SkylineGTRFreak's F/A-18F Super Hornet](https://www.gta5-mods.com/vehicles/f18f-super-hornet-addon) as a intercepting jet, but would like the pilot to use his cannon: `fa18f:VEHICLE_WEAPON_FA18F_GUN`.  
+Separate your models list using commas like so: `models=fa18f:VEHICLE_WEAPON_FA18F_GUN,lazer,hydra`.  
+
+`weapon_name` is found in the jet's `handling.meta` file, under `<Item type="CVehicleWeaponHandlingData">`.
+```XML
+<SubHandlingData>
+  <!-- ... -->
+  <Item type="CVehicleWeaponHandlingData">
+    <uWeaponHash>
+      <Item>VEHICLE_WEAPON_FA18F_GUN</Item>     <!-- these are the weapon names -->
+      <Item>VEHICLE_WEAPON_FA18F_ROCKET</Item>
+      <Item />
+    </uWeaponHash>
+    <!-- ... -->
+```
+
 #### Aircraft Only
 If `aircraftOnly` setting is `true`, jets will only be scrambled if you are in a helicopter or plane.
 
@@ -31,6 +51,9 @@ In cheats, type:
 
 ---
 ## Changelog
+### 1.0:
+- enabled custom weapons for intercepting jets
+  - read instructions in Settings section!
 ### 0.3:
 - restored `aircraftOnly` option
 ### 0.2.5:

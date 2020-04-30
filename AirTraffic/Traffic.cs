@@ -199,19 +199,9 @@ namespace AirTraffic
 
 
 
-		protected Model[] readModelsFromString(string models)
+		protected virtual Model[] readModelsFromString(string models)
 		{
-			// split the string on comma delimiter, then generate hash from each model name
 			return models.Split(',').ToList().Select(model => (Model)Game.GenerateHash(model.Trim())).ToArray();
-		}
-
-
-
-		protected Dictionary<Model, string> readModelsFromStringToDict(string models)
-		{
-			// same as readModelsFromString, but creates a dictionary
-			List<string> modelStrings = models.Split(',').ToList();
-			return modelStrings.ToDictionary(model => (Model)Game.GenerateHash(model.Trim()), model => model);
 		}
 
 

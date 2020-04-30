@@ -19,6 +19,7 @@ namespace AirTraffic
 		protected bool _belowRadar;
 		protected float _spawnDistance;
 		protected const float _radarHeight = 100f;
+		protected CustomWeaponJet[] _jets;
 		#endregion
 
 
@@ -27,8 +28,7 @@ namespace AirTraffic
 		{
 			// read in settings for Jets
 			string section = "JetsWanted";
-			_models = readModelsFromString(ss.GetValue<string>(section, "models", "lazer,hydra"));
-			_modelDict = readModelsFromStringToDict(ss.GetValue<string>(section, "models", "lazer,hydra"));
+			_jets = readCwjFromString(ss.GetValue<string>(section, "models", "lazer,hydra"));
 			numJetsByWantedLevel = new int[] {
 				0, 0, 0,											// 0, 1, and 2 stars respectively
 				ss.GetValue<int>(section, "numJets3stars", 0),		// 3 stars
@@ -90,6 +90,55 @@ namespace AirTraffic
 				}
 			}
 		}
+
+
+
+		protected override Vehicle spawnAirTraffic()
+		{
+			// randomly select a jet to spawn
+			CustomWeaponJet selectedJet = _jets[rng.Next(0, _jets.Length)];
+
+			// determine the position and orientation to spawn the vehicle
+			Vector3 spawnPos = getSpawnPosition();
+			float spawnHeading = (float)rng.NextDouble() * 360f;
+
+			// spawn vehicle
+			Vehicle veh = World.CreateVehicle(selectedJet.model, spawnPos, spawnHeading);
+			if (veh == null)
+			{
+				string modelName = selectedJet.modelName;
+				GTA.UI.Notification.Show("~r~Jet Intercept: unable to spawn vehicle: " + modelName);
+				return null;
+			}
+
+			// configure vehicle
+			configureVehicle(veh);
+
+			// spawn pilot in vehicle
+			Ped pilot = spawnPilotInVehicle(veh);
+
+			// give the pilot a task
+			pilotTasking(veh, pilot);
+
+			// if applicable, make pilot switch weapon
+			if (selectedJet.weaponName != "")
+			{
+				bool pilotSwitchedWeapon = pilotSetVehicleWeapon(pilot, selectedJet.weaponHash);
+				if (!pilotSwitchedWeapon)		// if unsuccessful
+				{
+					GTA.UI.Notification.Show("~r~Jet Intercept: pilot of " + selectedJet.modelName +
+						" unable to switch to weapon " + selectedJet.weaponName);
+				}
+			}
+
+
+			// draw blip on vehicle
+			if (_drawBlip)
+				drawCustomBlip(veh);
+
+			return veh;
+		}
+
 
 
 		/// <summary>
@@ -207,5 +256,54 @@ namespace AirTraffic
 
 			return false;
 		}
+
+
+
+		protected CustomWeaponJet[] readCwjFromString(string models)
+		{
+			// split the string on comma delimiter, then generate hash from each model name
+			List<string> modelStrings = models.Split(',').ToList();
+
+			// custom weapons: split each modelString on colon ":"
+			CustomWeaponJet[] cwj = new CustomWeaponJet[modelStrings.Count];
+			for (int i = 0; i < modelStrings.Count; i++)
+			{
+				List<string> modelStringSplit = modelStrings[i].Trim().Split(':').ToList();
+				cwj[i] = new CustomWeaponJet()
+				{
+					modelString = modelStrings[i],
+					modelName = modelStringSplit[0],
+					model = Game.GenerateHash(modelStringSplit[0]),
+					weaponName = modelStringSplit.Count >= 2 ? modelStringSplit[1] : "",
+					weaponHash = modelStringSplit.Count >= 2 ? (Hash)Game.GenerateHash(modelStringSplit[1]) : (Hash)0
+				};
+			}
+
+			return cwj;
+		}
+
+
+
+		protected bool pilotSetVehicleWeapon(Ped pilot, Hash weaponHash)
+		{
+			// set pilot's vehicle weapon
+			Function.Call(Hash.SET_CURRENT_PED_VEHICLE_WEAPON, pilot, weaponHash);
+
+			// confirm whether the ped's vehicle weapon was correctly updated
+			return true;
+		}
+	}
+
+
+
+	public struct CustomWeaponJet
+	{
+		public string modelString;
+
+		public Model model;
+		public string modelName;
+
+		public Hash weaponHash;
+		public string weaponName;
 	}
 }
