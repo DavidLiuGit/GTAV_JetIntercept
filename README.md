@@ -55,6 +55,8 @@ In cheats, type:
 [Release on GTA5 Mods](https://www.gta5-mods.com/scripts/jets-when-wanted)
 
 ### Changelog
+#### 1.0.1:
+- bugfix: disable AI pilot switching weapon after being assigned their custom weapon
 #### 1.0:
 - enabled custom weapons for intercepting jets
   - read instructions in Settings section!
