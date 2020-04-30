@@ -125,10 +125,8 @@ namespace AirTraffic
 			{
 				bool pilotSwitchedWeapon = pilotSetVehicleWeapon(pilot, selectedJet.weaponHash);
 				if (!pilotSwitchedWeapon)		// if unsuccessful
-				{
 					GTA.UI.Notification.Show("~r~Jet Intercept: pilot of " + selectedJet.modelName +
 						" unable to switch to weapon " + selectedJet.weaponName);
-				}
 			}
 
 
@@ -251,7 +249,12 @@ namespace AirTraffic
 			if (!_belowRadar)
 				return false;
 
+			// if player's height above ground is less than radar height, then player is below radar
 			if (player.HeightAboveGround < _radarHeight)
+				return true;
+
+			// if player is below sea level, then player is below radar
+			else if (player.Position.Z < 0f)
 				return true;
 
 			return false;
@@ -287,10 +290,9 @@ namespace AirTraffic
 		protected bool pilotSetVehicleWeapon(Ped pilot, Hash weaponHash)
 		{
 			// set pilot's vehicle weapon
-			Function.Call(Hash.SET_CURRENT_PED_VEHICLE_WEAPON, pilot, weaponHash);
-
-			// confirm whether the ped's vehicle weapon was correctly updated
-			return true;
+			bool res = Function.Call<bool>(Hash.SET_CURRENT_PED_VEHICLE_WEAPON, pilot, weaponHash);
+			pilot.CanSwitchWeapons = false;
+			return res;
 		}
 	}
 

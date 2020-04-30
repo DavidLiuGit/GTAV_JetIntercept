@@ -50,23 +50,29 @@ In cheats, type:
   - `<x>stars` to set wanted level. For example, `3stars` will set your wanted level to 3
 
 ---
-## Changelog
-### 1.0:
+## Development
+[Source code on GitHub](https://github.com/DavidLiuGit/GTAV_JetIntercept)  
+[Release on GTA5 Mods](https://www.gta5-mods.com/scripts/jets-when-wanted)
+
+### Changelog
+#### 1.0.1:
+- bugfix: disable AI pilot switching weapon after being assigned their custom weapon
+#### 1.0:
 - enabled custom weapons for intercepting jets
   - read instructions in Settings section!
-### 0.3:
+#### 0.3:
 - restored `aircraftOnly` option
-### 0.2.5:
+#### 0.2.5:
 - implemented below radar setting; jets will not be scrambled if player's aircraft is < 100 meters above the ground
-### 0.2.4:
+#### 0.2.4:
 - make pursuing jets spawn **behind** player instead of in front, by default
-### 0.2.3:
+#### 0.2.3:
 - added INI setting for spawn distance; default value 500 meters
-### 0.2.2 (unreleased):
+#### 0.2.2 (unreleased):
 - added cheats to get you back into a dogfight quickly after death. In cheats, type:
   - `goto lsia`, `goto zancudo`, or `goto sandyshores` to teleport to an airport
   - `<x>stars` to set wanted level. For example, `3stars` will set your wanted level to 3
-### 0.2.1:
+#### 0.2.1:
 - suppressed "jets needed" debug output
-### 0.2:
+#### 0.2:
 - renamed file to CustomWantedAirTraffic. Please remove CustomAirTraffic if you have already installed 0.1
