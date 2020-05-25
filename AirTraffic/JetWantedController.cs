@@ -20,6 +20,9 @@ namespace AirTraffic
 		protected float _spawnDistance;
 		protected const float _radarHeight = 100f;
 		protected CustomWeaponJet[] _jets;
+
+		// blip
+		protected bool _rotateBlips = true;
 		#endregion
 
 
@@ -89,6 +92,10 @@ namespace AirTraffic
 					_lastVehicleSpawnTime = currTime;
 				}
 			}
+
+			// update blips if drawn
+			if (this._drawBlip)
+				updateBlips();
 		}
 
 
@@ -293,6 +300,16 @@ namespace AirTraffic
 			bool res = Function.Call<bool>(Hash.SET_CURRENT_PED_VEHICLE_WEAPON, pilot, weaponHash);
 			pilot.CanSwitchWeapons = false;
 			return res;
+		}
+
+
+
+		protected void updateBlips()
+		{
+			foreach (Vehicle veh in this._spawnedVehicles)
+			{
+				veh.AttachedBlip.Rotation = (int) veh.Heading;
+			}
 		}
 	}
 
