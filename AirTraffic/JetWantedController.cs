@@ -16,6 +16,7 @@ namespace AirTraffic
 		#region properties
 		protected int[] numJetsByWantedLevel;
 		protected bool _aircraftOnly;
+		protected bool _planesOnly;				// exclude helicopters
 		protected bool _belowRadar;
 		protected float _spawnDistance;
 		protected const float _radarHeight = 100f;
@@ -39,6 +40,7 @@ namespace AirTraffic
 				ss.GetValue<int>(section, "numJets5stars", 3),		// 5 stars
 			};
 			_aircraftOnly = ss.GetValue<bool>(section, "aircraftOnly", true);
+			_planesOnly = ss.GetValue<bool>(section, "planesOnly", false);
 			_drawBlip = ss.GetValue<bool>(section, "blip", true);
 			_spawnTime = ss.GetValue<int>(section, "respawnTime", 30);
 			_spawnDistance = ss.GetValue<float>(section, "spawnDistance", 500f);
@@ -159,8 +161,18 @@ namespace AirTraffic
 			{
 				// get the player's current vehicle, if any
 				Vehicle playerVeh = Game.Player.Character.CurrentVehicle;
-				if (playerVeh == null) jetsNeeded = 0;
-				else if (!playerVeh.Model.IsPlane && !playerVeh.Model.IsHelicopter) jetsNeeded = 0;
+
+				// if player is not in a vehicle, return 0
+				if (playerVeh == null)													
+					jetsNeeded = 0;
+
+				// otherwise: if planesOnly is true, but player is not in a plane, return 0
+				else if (_planesOnly && !playerVeh.Model.IsPlane)
+					jetsNeeded = 0;
+
+				// otherwise: if none of the above is true, but player's vehicle is neither a heli or a plane, return 0
+				else if (!playerVeh.Model.IsHelicopter && !playerVeh.Model.IsPlane)
+					jetsNeeded = 0;
 			}
 
 			return jetsNeeded;

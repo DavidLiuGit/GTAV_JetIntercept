@@ -55,6 +55,8 @@ In cheats, type:
 [Release on GTA5 Mods](https://www.gta5-mods.com/scripts/jets-when-wanted)
 
 ### Changelog
+#### 1.1:
+- added `planesOnly` option. If set to `true`, jets will not spawn if player is in a helicopter
 #### 1.0.2:
 - Jet blips on the map/radar now show heading of the jets. Updated once per second
 #### 1.0.1:
